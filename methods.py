@@ -134,8 +134,8 @@ def koeff_cubic_spline(x, y, n):
     d = []
     for i in range(2, n):
         j = i - 2
-        hi_1 = x[i - 2] - x[i - 1]
-        hi = x[i - 1] - x[i]
+        hi_1 = abs(x[i - 2] - x[i - 1])
+        hi = abs(x[i - 1] - x[i])
         a.append(hi_1 if j != 0 else 0)
         b.append(2 * (hi_1 + hi))
         c.append(hi if i != n - 1 else 0)
@@ -146,15 +146,16 @@ def koeff_cubic_spline(x, y, n):
         koeff['c'][i + 2] = c_koeff[i]
     koeff['c'][n] = 0
     for i in range(1, n):
-        h = x[i - 1] - x[i]
+        h = abs(x[i - 1] - x[i])
         koeff['a'][i] = y[i - 1]
-        koeff['b'][i] = (y[i] - y[i - 1]) / h - (koeff['c'][i + 1] + 2 * koeff['c'][i]) * h / 3
+        koeff['b'][i] = (y[i] - y[i - 1]) / h - ((koeff['c'][i + 1] + 2 * koeff['c'][i]) * h) / 3
         koeff['d'][i] = (koeff['c'][i + 1] - koeff['c'][i]) / (3 * h)
     return koeff
 
 
 def cubic_spline_method(x, koeff, t, n):
+    t_round = round(t, 2)
     for i in range(1, n):
-        if x[i - 1] <= t and t <= x[i]:
-            return koeff['a'][i] + koeff['b'][i] * (t - x[i - 1]) + \
-                   koeff['c'][i] * (t - x[i - 1])**2 + koeff['d'][i] * (t - x[i - 1])**3
+        if x[i - 1] <= t_round <= x[i]:
+            return koeff['a'][i] + koeff['b'][i] * (t_round - x[i - 1]) + \
+                   koeff['c'][i] * (t_round - x[i - 1])**2 + koeff['d'][i] * (t_round - x[i - 1])**3
